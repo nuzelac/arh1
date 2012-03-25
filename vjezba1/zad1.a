@@ -1,0 +1,32 @@
+        `ORG    0
+    
+        LOAD    R0, (500)    ; brojac za petlju
+        MOVE    504, R1      ; pozicija trenutnog podatka
+        MOVE    1000, R2     ; pozicija za unos 16-bitnog podatka
+    
+PETLJA  AND     R0, R0, R0
+        JR_Z    KRAJ
+        
+        LOAD    R3, (R1)     ; niza 32-bitna rijec 64-bitne rijeci
+        LOAD    R4, (R1 + 4) ; visa 32-bitna rijec 64-bitne rijeci
+        
+        ROTL    R4, 1, R5
+        AND     R5, 1, R5    ; testiranje bita za predznak
+        JR_Z    POZ
+        
+NEG     XOR     R3, -1, R3   ; B-1 komplement
+        ADD     R3,  1, R3   ; B komplement
+
+POZ     STOREH  R3, (R2)     ; spremi 16-bitnu polurijec i za negativni i za pozitivni
+    
+        SUB     R0, 1, R0    ; smanji brojac za petlju
+        ADD     R1, 8, R1    ; pomakni adresu na sljedeci 64-bitni podatak
+        ADD     R2, 2, R2    ; pomakni adresu za spremanje 16-bitnog podatka
+        JR      PETLJA
+        
+KRAJ    MOVE    8000, R0     ; oznaka za kraj novog bloka
+        STOREH  R0, (R2)
+        HALT
+
+        `ORG 500 ; TODO provjeriti jel ovo dobro zapisano
+        DW  5, 1, 80000000, 2, 0, 4, 80000000, 25, 0, 49, 80000000

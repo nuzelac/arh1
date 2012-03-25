@@ -1,0 +1,20 @@
+        `ORG 0
+        MOVE    50, R1
+        MOVE    70, R2
+        MOVE    5, R3
+        
+PETLJA  LOAD  R0, (R1)
+        STORE   R0, (R2)
+        ADD     R1, 4, R1
+        ADD     R2, 4, R2
+        SUB     R3, 1, R3
+        JR_NZ   PETLJA
+        
+        HALT
+        
+        `ORG    50
+        DW      1, 2, 3, 4, 5
+        
+        `ORG    70
+        `DS     %D 20
+        `END
