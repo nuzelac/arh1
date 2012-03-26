@@ -28,7 +28,7 @@
 00000048  00 00 20 AC          STOREH  R0, (R2) 
 0000004C  00 00 00 F8          HALT 
                         
-                               `ORG 500 ; TODO provjeriti jel ovo dobro zapisano
+                               `ORG 500 
 00000500  05 00 00 00          DW  5, 1, 80000000, 2, 0, 4, 80000000, 25, 0, 49,
           01 00 00 00  
           00 00 00 80  
