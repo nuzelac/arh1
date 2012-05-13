@@ -1,14 +1,14 @@
-VJ1DATA		`EQU	0xFFFF1000
+VJ1DATA		`EQU	0FFFF1000
 
-VJ2DATA		`EQU	0xFFFF2000
-VJ2STAT		`EQU	0xFFFF2004
-VJ2CLEAR	`EQU	0xFFFF2004
+VJ2DATA		`EQU	0FFFF2000
+VJ2STAT		`EQU	0FFFF2004
+VJ2CLEAR	`EQU	0FFFF2004
 
-VJ3DATA		`EQU	0xFFFF3000
-VJ3IACK		`EQU	0xFFFF3004
-VJ3STAT		`EQU	0xFFFF3004
-VJ3IEND		`EQU	0xFFFF3008
-VJ3STOP		`EQU	0xFFFF300C
+VJ3DATA		`EQU	0FFFF3000
+VJ3IACK		`EQU	0FFFF3004
+VJ3STAT		`EQU	0FFFF3004
+VJ3IEND		`EQU	0FFFF3008
+VJ3STOP		`EQU	0FFFF300C
 
 
 			`ORG 0
@@ -19,7 +19,8 @@ VJ3STOP		`EQU	0xFFFF300C
 			DW 1000
 
 			
-GLAVNI		MOVE 1, R0
+GLAVNI		MOVE 0, R6			; brojac poslanih podataka na vj2
+			MOVE 1, R0
 			STORE R0, (VJ3STOP) ; ukljucivanje prekida na vj3
 			MOVE %B 10010000, R0
 			MOVE R0, SR 		; ukljucivanje GIE i dozvola prekida na INT0
@@ -33,34 +34,49 @@ PETLJA		LOAD R0, (VJ2STAT)
 			LOAD R0, (BROJ)		
 			STORE R0, (VJ2DATA)
 			STORE R0, (VJ2CLEAR)
+			ADD R6, 1, R6
 			JR PETLJA		
 
+KRAJ		MOVE %B 0, SR 		; zabrana daljnjih prekida
+			HALT
+
+OBRADI		PUSH R1
+
+			LOAD R1, (R0 + 0C)	; brojac za potenciju
+			MOVE 1, R0			; 2^0 = 1
+
+POTENCIRAJ	CMP R1, 0
+			JR_Z VRATIREZ
+			SHL R0, 1, R0			
+			SUB R1, 1, R1
+			JR POTENCIRAJ		
+
+VRATIREZ	POP R1
+			RET
+
 			`ORG 1000
-			; prekidni potprogram
-			; spremanje konteksta
-			PUSH R0
+PREKIDNI	STORE R0, (VJ3IACK)
+
+			PUSH R0				; spremanje konteksta 
 			MOVE SR, R0
 			PUSH R0
+
+			LOAD R0, (VJ1DATA)
+			CMP R0, 0
+			JR_N KRAJ 			; ako sa vj1 dobijemo negativan podatak, kraj
+
+			PUSH R0
+			CALL OBRADI
+			ADD SP, 4, SP
+			STORE R0, (BROJ)
 			
-
-
+			STORE R6, (VJ3DATA)
 
 			POP R0
 			MOVE R0, SR
 			POP R0
 
+			STORE R0, (VJ3IEND)
 			RETI
 
-
-
-
-
-
-
-
-
-
-
-
 BROJ		DW 0	
-
