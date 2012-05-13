@@ -1,0 +1,66 @@
+VJ1DATA		`EQU	0xFFFF1000
+
+VJ2DATA		`EQU	0xFFFF2000
+VJ2STAT		`EQU	0xFFFF2004
+VJ2CLEAR	`EQU	0xFFFF2004
+
+VJ3DATA		`EQU	0xFFFF3000
+VJ3IACK		`EQU	0xFFFF3004
+VJ3STAT		`EQU	0xFFFF3004
+VJ3IEND		`EQU	0xFFFF3008
+VJ3STOP		`EQU	0xFFFF300C
+
+
+			`ORG 0
+			MOVE 10000, SP
+			JR GLAVNI
+
+			`ORG 08
+			DW 1000
+
+			
+GLAVNI		MOVE 1, R0
+			STORE R0, (VJ3STOP) ; ukljucivanje prekida na vj3
+			MOVE %B 10010000, R0
+			MOVE R0, SR 		; ukljucivanje GIE i dozvola prekida na INT0
+
+			; spremnost vj2
+PETLJA		LOAD R0, (VJ2STAT)
+			AND R0, 1, R0
+			JR_Z PETLJA
+
+			; posalji podatak sa mem. lokacije BROJ na vj2
+			LOAD R0, (BROJ)		
+			STORE R0, (VJ2DATA)
+			STORE R0, (VJ2CLEAR)
+			JR PETLJA		
+
+			`ORG 1000
+			; prekidni potprogram
+			; spremanje konteksta
+			PUSH R0
+			MOVE SR, R0
+			PUSH R0
+			
+
+
+
+			POP R0
+			MOVE R0, SR
+			POP R0
+
+			RETI
+
+
+
+
+
+
+
+
+
+
+
+
+BROJ		DW 0	
+
