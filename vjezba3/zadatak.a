@@ -42,7 +42,7 @@ KRAJ		MOVE %B 0, SR 		; zabrana daljnjih prekida
 
 OBRADI		PUSH R1
 
-			LOAD R1, (R0 + 0C)	; brojac za potenciju
+			LOAD R1, (SP + 08)	; brojac za potenciju
 			MOVE 1, R0			; 2^0 = 1
 
 POTENCIRAJ	CMP R1, 0
