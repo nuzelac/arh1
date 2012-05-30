@@ -1,0 +1,32 @@
+		`ORG 0
+		MOV SP, #1<16
+
+
+
+
+
+
+KUB		LDMFD SP!, {R0}		; parametar
+		STMFD SP!, {R1}		; spremanje konteksta
+		MOV R1, R0
+
+		MUL R0, R1, R0			; u R0 = x^2
+		MUL R0, R1, R0			; u R0 = x^3
+
+		LDMFD SP!, {R1}
+		MOV PC, LR
+
+DIV		STMFD SP!, {R1, R2}
+		ADD R0, SP, #8
+		LDMFD R0, {R1, R2}
+
+		
+
+
+		MOV PC, LR
+
+
+
+
+		`ORG 100
+		DW 0, 3, 6, -1, -6, 80000000
