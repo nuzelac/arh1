@@ -1,0 +1,92 @@
+		`ORG 0
+		B GLAVNi
+
+		`ORG 18
+PREKID	STMFD R13!, {R0, R3, R14}
+
+		LDR R3, RTC
+
+		STR R0, [R3, #8]
+		MOV R0, #0
+		STR R0, [R3, #0C]
+		MOV R0, #1<8
+		STR R0, [R3, #4]
+
+		BL PISI
+
+		LDMFD R13!, {R0, R3, R14}
+		SUBS PC, R14, #4
+
+PISI	STMFD R13!, {R0, R1, R2, R14}
+		
+		LDR R2, GPIO
+
+		MOV R0, #0D
+		BL LCDWR
+
+
+		MOV R0, #3E ; >>>
+		BL LCDWR
+		BL LCDWR
+		BL LCDWR
+
+POC		MOV R0, #4<8
+		LDR R1, INDEX
+		ADD R0, R0, R1
+		LDR R0, [R0]
+		CMP R0, #0
+		MOVEQ R1, #0
+		STREQ R1, INDEX
+		BEQ POC			; ako smo ucitali \0, krecemo ispocetka
+
+		ADD R1, R1, #1
+		STR R1, INDEX
+
+		BL LCDWR
+
+		MOV R0, #3C ; <<<
+		BL LCDWR
+		BL LCDWR
+		BL LCDWR
+
+		MOV R0, #0A
+		BL LCDWR
+
+KRAJ	LDMFD R13!, {R0, R1, R2, R14}
+		MOV PC, LR
+	
+
+GLAVNI	MOV SP, #1<16
+		; inicijalizacija RTC
+		LDR R3, RTC
+		MOV R4, #1<8
+		STR R4, [R3, #4] ; napuni RTCMR
+		MOV R4, #1
+		STR R4, [R3, #10]
+
+		MRS R0, CPSR
+		BIC R0, R0, #80
+		MSR CPSR_c, R0
+
+PETLJA	B PETLJA
+
+LCDWR	STMFD R13!, {R0}
+	
+		AND R0, R0, #7F
+		STRB R0, [R2, #4]
+
+		ORR R0, R0, #80
+		STRB R0, [R2, #4]
+
+		AND R0, R0, #7F
+		STRB R0, [R2, #4]
+
+		LDMFD R13!, {R0}
+		MOV PC, LR
+
+INDEX	DW 0
+RTC		DW 0FFFFFE00
+GPIO	DW 0FFFFFF00		
+
+		`ORG 400
+STRING	DB 49,6e,74,65,72,6e,61,74,69,6f,6e,61,6c,69,73,61,74,69,6f,6e,0
