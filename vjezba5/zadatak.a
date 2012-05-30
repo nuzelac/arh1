@@ -1,17 +1,35 @@
 		`ORG 0
 		MOV SP, #1<16
+		MOV R6, #1<8 ; izvoriste
+		MOV R7, #4<8 ; odrediste
 
+PETLJA  LDR R3, [R6], #4
+		CMP R3, #8<28
+		BEQ IZLAZ
 
+		STMFD SP!, {R3}
+		BL KUB
+	
+		SUB R0, R0, #1 		; R0 = x^3 - 1
 
+		ADD R1, R3, R3 		; R1 = 2*x
 
+		STMFD SP!, {R0, R1}
+		BL DIV
+		ADD SP, SP, #8
+
+		STR R0, [R7], #4
+
+		B PETLJA
+IZLAZ	HALT
 
 
 KUB		LDMFD SP!, {R0}		; parametar
 		STMFD SP!, {R1}		; spremanje konteksta
 		MOV R1, R0
 
-		MUL R0, R1, R0			; u R0 = x^2
-		MUL R0, R1, R0			; u R0 = x^3
+		MUL R0, R1, R0		; u R0 = x^2
+		MUL R0, R1, R0		; u R0 = x^3
 
 		LDMFD SP!, {R1}
 		MOV PC, LR
@@ -20,13 +38,24 @@ DIV		STMFD SP!, {R1, R2}
 		ADD R0, SP, #8
 		LDMFD R0, {R1, R2}
 
-		
+		MOV R0, #0
+		CMP R2, #0
+		BLT NEG
 
+POZ		CMP R1, R2
+		SUBGE R1, R1, R2
+		ADDGE R0, R0, #1
+		BGE POZ
 
+		B KRAJ
+
+NEG		CMP R1, R2
+		SUBLE R1, R1, R2
+		ADDLE R0, R0, #1
+		BLE NEG
+
+KRAJ	LDMFD SP!, {R1, R2}
 		MOV PC, LR
-
-
-
 
 		`ORG 100
 		DW 0, 3, 6, -1, -6, 80000000
