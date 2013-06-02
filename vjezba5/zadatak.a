@@ -1,4 +1,4 @@
-		; kodokradljivac (?)
+		; bok, kodokradljivac (?)
 		`ORG 0
 		MOV SP, #1<16
 		MOV R6, #1<8 ; izvoriste
